@@ -21,8 +21,9 @@ public class Main extends Application {
     private Group root = new Group();
     private Canvas canvas = new Canvas(800, 600);
     private GraphicsContext gc = canvas.getGraphicsContext2D();
-    private static Image image;
-    private static ImageView imageView;
+    Sprite player = null;
+    private static Image rotating_blade;
+    private static ImageView rotating_blade_view;
     private double[] xVals = {435, 455, 445};
     private double[] yVals = {600, 600, 570};
     private double[] xVals1 = {455, 475, 465};
@@ -43,9 +44,9 @@ public class Main extends Application {
 
     private static void instantiateImages() {
         try {
-            image = new Image(new FileInputStream("D:\\Documents\\School Stuff\\Grade 10\\ICS 12\\ICS ISP\\Friend-Racer\\res\\rotating_blades\\blade_1.png"));
+            rotating_blade = new Image(new FileInputStream("D:\\Documents\\School Stuff\\Grade 10\\ICS 12\\ICS ISP\\Friend-Racer\\res\\rotating_blades\\blade_1.png"));
         } catch (Exception e) {}
-        imageView = new ImageView(image);
+        rotating_blade_view = new ImageView(rotating_blade);
     }
 
     private void drawWorld() {
@@ -63,23 +64,25 @@ public class Main extends Application {
         gc.fillPolygon(xVals4, yVals4, 3);
         gc.fillPolygon(xVals5, yVals5, 3);
         gc.fillPolygon(xVals6, yVals6, 3);
-        imageView.setX(175);
-        imageView.setY(575);
-        imageView.setFitWidth(25);
-        imageView.setFitHeight(25);
+        rotating_blade_view.setX(175);
+        rotating_blade_view.setY(575);
+        rotating_blade_view.setFitWidth(25);
+        rotating_blade_view.setFitHeight(25);
     }
 
     public void start(Stage stage) {
         Scene scene = new Scene(root);
         ArrayList<Integer[]> platforms = new ArrayList<Integer[]>(); //format: y, start x, end x
         ArrayList<Integer[]> obstacles = new ArrayList<Integer[]>(); //format: start x, start y, end x, end y
-        Sprite p = new Sprite();
+        try {
+            player = new Sprite(new Image(new FileInputStream("D:\\Documents\\School Stuff\\Grade 10\\ICS 12\\ICS ISP\\Friend-Racer\\res\\running_man.png")), 40, new Image(new FileInputStream("D:\\Documents\\School Stuff\\Grade 10\\ICS 12\\ICS ISP\\Friend-Racer\\res\\running_man - erase.png")));
+        } catch (Exception e) {}
 
-        p.setPos(50, 500);
-        p.render(gc);
+        player.setPos(20, 601 - player.getHeight());
+        player.render(gc);
 
         root.getChildren().add(canvas);
-        root.getChildren().add(imageView);
+        root.getChildren().add(rotating_blade_view);
 
         drawWorld();
 
@@ -127,9 +130,9 @@ public class Main extends Application {
             public int[] playerPlatformStatus() { // 0: on platform, -1: above platform, 1: below platform
                 for (int i = 0; i < platforms.size(); i++) {
                     Integer[] platform = platforms.get(i);
-                    if (p.getPos().y + p.getHeight() + 1 == platform[0] && (p.getPos().x + p.getWidth() >= platform[1] && p.getPos().x <= platform[2]))
+                    if (player.getPos().y + player.getHeight() + 1 == platform[0] && (player.getPos().x + player.getWidth() >= platform[1] && player.getPos().x <= platform[2]))
                         return new int[]{0, i};
-                    if (p.getPos().y + p.getHeight() >= platform[0]  && (p.getPos().x + p.getWidth() >= platform[1] && p.getPos().x <= platform[2]))
+                    if (player.getPos().y + player.getHeight() >= platform[0]  && (player.getPos().x + player.getWidth() >= platform[1] && player.getPos().x <= platform[2]))
                         return new int[]{1, i};
                 }
                 return new int[]{-1, -1};
@@ -137,19 +140,19 @@ public class Main extends Application {
 
             public boolean hitObstacle() {
                 for (Integer[] obstacle : obstacles) {
-                    if (((obstacle[0] > p.getPos().x && obstacle[0] < p.getPos().x + p.getWidth()) || (obstacle[2] > p.getPos().x && obstacle[2] < p.getPos().x + p.getWidth())) && ((obstacle[1] > p.getPos().y && obstacle[1] < p.getPos().y + p.getHeight()) || (obstacle[3] > p.getPos().y && obstacle[3] < p.getPos().y + p.getHeight())))
+                    if (((obstacle[0] > player.getPos().x && obstacle[0] < player.getPos().x + player.getWidth()) || (obstacle[2] > player.getPos().x && obstacle[2] < player.getPos().x + player.getWidth())) && ((obstacle[1] > player.getPos().y && obstacle[1] < player.getPos().y + player.getHeight()) || (obstacle[3] > player.getPos().y && obstacle[3] < player.getPos().y + player.getHeight())))
                         return true;
                 }
                 return false;
             }
 
             public void respawn (double time) {
-                p.setPos(50, 500);
-                p.setVel(p.getVel().x, 0);
+                player.setPos(20, 601 - player.getHeight());
+                player.setVel(player.getVel().x, 0);
                 if (time <= 0.25 || (time > 0.5 && time <= 0.75) || (time > 1 && time <= 1.25) || (time > 1.5 && time <= 1.75)) {
-                    p.render(gc);
+                    player.render(gc);
                 } else {
-                    p.erase(gc);
+                    player.erase(gc);
                 }
             }
 
@@ -159,13 +162,13 @@ public class Main extends Application {
                 gc.setFill(Color.GREEN);
                 gc.fillText("GAME IS PAUSED, PRESS \'r\' TO CONTINUE", 200, 200);
                 gc.setFill(Color.RED);
-                imageView.setImage(null);
+                rotating_blade_view.setImage(null);
             }
 
             @Override
             public void handle(long currentTime) {
                 if (!pause && !respawn) {
-                    imageView.setRotate(imageView.getRotate() + 4);
+                    rotating_blade_view.setRotate(rotating_blade_view.getRotate() + 4);
                 }
                 if (pause) {
                     pause();
@@ -174,9 +177,9 @@ public class Main extends Application {
                     if (startReturnCountdown == -1) {
                         startReturnCountdown = currentTime;
                     }
-                    imageView.setImage(image);
+                    rotating_blade_view.setImage(rotating_blade);
                     drawWorld();
-                    p.render(gc);
+                    player.render(gc);
                     gc.setFill(Color.GREEN);
                     if ((currentTime-startReturnCountdown)/1000000000.0 <= 1) {
                         gc.fillText("3", 50, 50);
@@ -199,32 +202,32 @@ public class Main extends Application {
                         }
                         if (startTime == -1)
                             startTime = currentTime;
-                        p.erase(gc);
+                        player.erase(gc);
                         if (jump && playerPlatformStatus()[0] == -1) {
                             jump = false;
                         }
                         if (jump && playerPlatformStatus()[0] == 0) {
-                            p.addVel(0, -15);
+                            player.addVel(0, -15);
                             jump = false;
                             startGravityTime = currentTime;
                         }
                         if (startTime == currentTime) {
-                            p.addVel(3, 0);
+                            player.addVel(3, 0);
                         }
                         if (playerPlatformStatus()[0] < 0) {
-                            p.addVel(0, (int) Math.round(9.8 * ((currentTime - startGravityTime) / 1000000000.0)));
+                            player.addVel(0, (int) Math.round(9.8 * ((currentTime - startGravityTime) / 1000000000.0)));
                         }
-                        p.update();
+                        player.update();
                         if (playerPlatformStatus()[0] == 1) {
-                            p.setPos(p.getPos().x, platforms.get(playerPlatformStatus()[1])[0] - p.getHeight() - 1);
-                            p.setVel(p.getVel().x, 0);
+                            player.setPos(player.getPos().x, platforms.get(playerPlatformStatus()[1])[0] - player.getHeight() - 1);
+                            player.setVel(player.getVel().x, 0);
                             drawWorld();
                         }
-                        p.render(gc);
+                        player.render(gc);
                         if (hitObstacle()) {
                             respawn = true;
                             startRespawnDelay = currentTime;
-                            p.erase(gc);
+                            player.erase(gc);
                             drawWorld();
                         }
                     }
