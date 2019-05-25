@@ -3,7 +3,9 @@ package Main;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
+import javafx.scene.SnapshotParameters;
 
 public class Sprite {
     private Image image;
@@ -12,6 +14,7 @@ public class Sprite {
     private Vector2D vel;
     private int width;
     private int height;
+    ImageView imgView;
 
     public Sprite(Image image, int width, Image erase) {
         this.image = image;
@@ -20,6 +23,7 @@ public class Sprite {
         vel = new Vector2D(0,0);
         this.width = width;
         this.height = (int)Math.round(image.getHeight()/(image.getWidth()/width));
+        imgView = new ImageView(image);
     }
 
     public void setPos(int x, int y) {
@@ -49,6 +53,16 @@ public class Sprite {
 
     public void render(GraphicsContext gc)
     {
+        gc.drawImage(image, pos.x, pos.y, width, height);
+    }
+
+    //TODO: alter the width and height so that when rotated, the image does not shrink
+    public void rotateImage(GraphicsContext gc, double speed) {
+        erase(gc);
+        imgView.setRotate(imgView.getRotate() + speed);
+        SnapshotParameters params = new SnapshotParameters();
+        params.setFill(Color.TRANSPARENT);
+        image = imgView.snapshot(params, null);
         gc.drawImage(image, pos.x, pos.y, width, height);
     }
 
