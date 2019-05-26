@@ -24,7 +24,7 @@ public class Main extends Application {
     private Canvas canvas = new Canvas(800, 600);
     private GraphicsContext gc = canvas.getGraphicsContext2D();
     private Sprite player = null;
-    private Sprite rotating_blade = null;
+    private SpinningSprite rotating_blade = null;
     private double[] xVals = {435, 455, 445};
     private double[] yVals = {600, 600, 570};
     private double[] xVals1 = {455, 475, 465};
@@ -77,7 +77,7 @@ public class Main extends Application {
             spike2 = new Sprite(new Image(new FileInputStream("D:\\Documents\\School Stuff\\Grade 10\\ICS 12\\ICS ISP\\Friend-Racer\\res\\spikes\\single_spike.png")), 13, new Image(new FileInputStream("D:\\Documents\\School Stuff\\Grade 10\\ICS 12\\ICS ISP\\Friend-Racer\\res\\spikes\\single_spike - erase.png")));
             spike3 = new Sprite(new Image(new FileInputStream("D:\\Documents\\School Stuff\\Grade 10\\ICS 12\\ICS ISP\\Friend-Racer\\res\\spikes\\single_spike.png")), 13, new Image(new FileInputStream("D:\\Documents\\School Stuff\\Grade 10\\ICS 12\\ICS ISP\\Friend-Racer\\res\\spikes\\single_spike - erase.png")));
             spike4 = new Sprite(new Image(new FileInputStream("D:\\Documents\\School Stuff\\Grade 10\\ICS 12\\ICS ISP\\Friend-Racer\\res\\spikes\\single_spike.png")), 13, new Image(new FileInputStream("D:\\Documents\\School Stuff\\Grade 10\\ICS 12\\ICS ISP\\Friend-Racer\\res\\spikes\\single_spike - erase.png")));
-            rotating_blade = new Sprite(new Image(new FileInputStream("D:\\Documents\\School Stuff\\Grade 10\\ICS 12\\ICS ISP\\Friend-Racer\\res\\rotating_blades\\blade_1.png")), 25, new Image(new FileInputStream("D:\\Documents\\School Stuff\\Grade 10\\ICS 12\\ICS ISP\\Friend-Racer\\res\\rotating_blades\\blade_1 - erase.png")));
+            rotating_blade = new SpinningSprite(new Image(new FileInputStream("D:\\Documents\\School Stuff\\Grade 10\\ICS 12\\ICS ISP\\Friend-Racer\\res\\rotating_blades\\blade_1.png")), 25, new Image(new FileInputStream("D:\\Documents\\School Stuff\\Grade 10\\ICS 12\\ICS ISP\\Friend-Racer\\res\\rotating_blades\\blade_1 - erase.png")));
         } catch (Exception e) {
         }
 
@@ -94,12 +94,12 @@ public class Main extends Application {
         spike3.setPos(552, 390);
         spike4.setPos(262, 555);
 
-        rotating_blade.setPos(174, 575);
-        rotating_blade.render(gc);
-
         root.getChildren().add(canvas);
 
         drawWorld();
+
+        rotating_blade.setPos(174, 575);
+        rotating_blade.render(gc);
 
         stage.setTitle("Friend Racer");
         stage.setScene(scene);
