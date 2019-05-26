@@ -57,8 +57,6 @@ public class Main extends Application {
         spike3.render(gc);
         spike4.render(gc);
 
-        rotating_blade.render(gc);
-
         gc.fillPolygon(xVals, yVals, 3);
         gc.fillPolygon(xVals1, yVals, 3);
         gc.fillPolygon(xVals2, yVals, 3);
@@ -96,7 +94,8 @@ public class Main extends Application {
         spike3.setPos(552, 390);
         spike4.setPos(262, 555);
 
-        rotating_blade.setPos(175, 575);
+        rotating_blade.setPos(174, 575);
+        rotating_blade.render(gc);
 
         root.getChildren().add(canvas);
 
@@ -139,6 +138,18 @@ public class Main extends Application {
             long startGravityTime = -1;
             long startRespawnDelay = -1;
             long startReturnCountdown = -1;
+
+            //TODO: make the world scroll past
+            /*public void scrollWorld() {
+                for (Sprite s : obstacles) {
+                    s.addVel(-1, 0);
+                    s.render(gc);
+                }
+                for (Sprite s : platforms) {
+                    s.addVel(-1, 0);
+                    s.render(gc);
+                }
+            }*/
 
             public int[] playerPlatformStatus() {
                 if (player.getPos().y + player.getHeight() > 601) {
@@ -198,6 +209,7 @@ public class Main extends Application {
                         startReturnCountdown = currentTime;
                     }
                     drawWorld();
+                    rotating_blade.render(gc);
                     player.render(gc);
                     gc.setFill(Color.GREEN);
                     if ((currentTime - startReturnCountdown) / 1000000000.0 <= 1) {
@@ -245,6 +257,7 @@ public class Main extends Application {
                             }
                             player.setVel(player.getVel().x, 0);
                             drawWorld();
+                            rotating_blade.render(gc);
                         }
                         player.render(gc);
                         if (hitObstacle()) {
@@ -252,6 +265,7 @@ public class Main extends Application {
                             startRespawnDelay = currentTime;
                             player.erase(gc);
                             drawWorld();
+                            rotating_blade.render(gc);
                         }
                     }
                 }
