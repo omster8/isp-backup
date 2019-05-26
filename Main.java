@@ -14,6 +14,7 @@ import java.util.ArrayList;
 
 //TODO: change the little logo on the top left of the run screen to our company logo
 //TODO: convert all image backgrounds to transparent (PNG) instead of white
+//TODO: make a legit ground that's a sprite
 public class Main extends Application {
     private boolean jump = false;
     private boolean pause = false;
@@ -65,8 +66,9 @@ public class Main extends Application {
 
     public void start(Stage stage) {
         Scene scene = new Scene(root);
-        ArrayList<Integer[]> platforms = new ArrayList<Integer[]>(); //format: y, start x, end x
-        ArrayList<Integer[]> obstacles = new ArrayList<Integer[]>(); //format: start x, start y, end x, end y
+        ArrayList<Sprite> platforms = new ArrayList<Sprite>();
+        ArrayList<Sprite> obstacles = new ArrayList<Sprite>();
+
         try {
             player = new Sprite(new Image(new FileInputStream("D:\\Documents\\School Stuff\\Grade 10\\ICS 12\\ICS ISP\\Friend-Racer\\res\\running_man.png")), 40, new Image(new FileInputStream("D:\\Documents\\School Stuff\\Grade 10\\ICS 12\\ICS ISP\\Friend-Racer\\res\\running_man - erase.png")));
             platform1 = new Sprite(new Image(new FileInputStream("D:\\Documents\\School Stuff\\Grade 10\\ICS 12\\ICS ISP\\Friend-Racer\\res\\platforms\\platform.PNG")), 80, new Image(new FileInputStream("D:\\Documents\\School Stuff\\Grade 10\\ICS 12\\ICS ISP\\Friend-Racer\\res\\platforms\\platform - erase.png")));
@@ -103,18 +105,16 @@ public class Main extends Application {
         stage.setTitle("Friend Racer");
         stage.setScene(scene);
 
-        platforms.add(new Integer[]{575, 200, 275});
-        platforms.add(new Integer[]{530, 295, 375});
-        platforms.add(new Integer[]{470, 390, 470});
-        platforms.add(new Integer[]{410, 485, 565});
-        platforms.add(new Integer[]{601, 0, 800}); // the ground
+        obstacles.add(spike1);
+        obstacles.add(spike2);
+        obstacles.add(spike3);
+        obstacles.add(spike4);
+        obstacles.add(rotating_blade);
 
-        obstacles.add(new Integer[]{435, 570, 495, 600});
-        obstacles.add(new Integer[]{365, 520, 375, 530});
-        obstacles.add(new Integer[]{460, 460, 470, 470});
-        obstacles.add(new Integer[]{555, 400, 565, 410});
-        obstacles.add(new Integer[]{265, 565, 275, 575});
-        obstacles.add(new Integer[]{175, 575, 200, 600});
+        platforms.add(platform1);
+        platforms.add(platform2);
+        platforms.add(platform3);
+        platforms.add(platform4);
 
         scene.setOnKeyPressed(event -> {
             switch (event.getCode()) {
@@ -140,21 +140,29 @@ public class Main extends Application {
             long startRespawnDelay = -1;
             long startReturnCountdown = -1;
 
-            public int[] playerPlatformStatus() { // 0: on platform, -1: above platform, 1: below platform
+            public int[] playerPlatformStatus() {
+                if (player.getPos().y + player.getHeight() > 601) {
+                    return new int[]{1, -1};
+                }
+                if (player.getPos().y + player.getHeight() == 601) {
+                    return new int[]{0, -1};
+                }
                 for (int i = 0; i < platforms.size(); i++) {
-                    Integer[] platform = platforms.get(i);
-                    if (player.getPos().y + player.getHeight() + 1 == platform[0] && (player.getPos().x + player.getWidth() >= platform[1] && player.getPos().x <= platform[2]))
-                        return new int[]{0, i};
-                    if (player.getPos().y + player.getHeight() >= platform[0] && (player.getPos().x + player.getWidth() >= platform[1] && player.getPos().x <= platform[2]))
+                    if (platforms.get(i).intersects(player)) {
                         return new int[]{1, i};
+                    }
+                    if (player.getPos().y + player.getHeight() + 1 == platforms.get(i).getPos().y && (player.getPos().x + player.getWidth() >= platforms.get(i).getPos().x && player.getPos().x <= platforms.get(i).getPos().x+platforms.get(i).getWidth())) {
+                        return new int[]{0, i};
+                    }
                 }
                 return new int[]{-1, -1};
             }
 
             public boolean hitObstacle() {
-                for (Integer[] obstacle : obstacles) {
-                    if (((obstacle[0] > player.getPos().x && obstacle[0] < player.getPos().x + player.getWidth()) || (obstacle[2] > player.getPos().x && obstacle[2] < player.getPos().x + player.getWidth())) && ((obstacle[1] > player.getPos().y && obstacle[1] < player.getPos().y + player.getHeight()) || (obstacle[3] > player.getPos().y && obstacle[3] < player.getPos().y + player.getHeight())))
+                for (Sprite s : obstacles) {
+                    if (player.intersects(s)) {
                         return true;
+                    }
                 }
                 return false;
             }
@@ -230,7 +238,11 @@ public class Main extends Application {
                         }
                         player.update();
                         if (playerPlatformStatus()[0] == 1) {
-                            player.setPos(player.getPos().x, platforms.get(playerPlatformStatus()[1])[0] - player.getHeight() - 1);
+                            if (playerPlatformStatus()[1] == -1) {
+                                player.setPos(player.getPos().x, 601 - player.getHeight());
+                            } else {
+                                player.setPos(player.getPos().x, platforms.get(playerPlatformStatus()[1]).getPos().y - player.getHeight() - 1);
+                            }
                             player.setVel(player.getVel().x, 0);
                             drawWorld();
                         }

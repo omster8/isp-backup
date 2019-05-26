@@ -14,7 +14,7 @@ public class Sprite {
     private Vector2D vel;
     private int width;
     private int height;
-    ImageView imgView;
+    private ImageView imgView;
 
     public Sprite(Image image, int width, Image erase) {
         this.image = image;
