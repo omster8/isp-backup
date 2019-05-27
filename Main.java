@@ -198,9 +198,6 @@ public class Main extends Application {
 
             @Override
             public void handle(long currentTime) {
-                if (!pause && !respawn) {
-                    rotating_blade.rotateImage(gc, 4);
-                }
                 if (pause) {
                     pause();
                 }
@@ -225,6 +222,7 @@ public class Main extends Application {
                     }
                 }
                 if (!pause) {
+                    rotating_blade.rotateImage(gc, 4);
                     if (respawn && (currentTime - startRespawnDelay) / 1000000000.0 <= 2) {
                         respawn((currentTime - startRespawnDelay) / 1000000000.0);
                     } else {
