@@ -6,19 +6,21 @@ import javafx.scene.image.Image;
 
 public class Sprite {
     public Image image;
-    public Image erase;
     public Vector2D pos;
     public Vector2D vel;
     public int width;
     public int height;
 
-    public Sprite(Image image, int width, Image erase) {
+    public Sprite(Image image, int width, int height) {
         this.image = image;
-        this.erase = erase;
         pos = new Vector2D(0, 0);
         vel = new Vector2D(0, 0);
         this.width = width;
-        this.height = (int) Math.round(image.getHeight() / (image.getWidth() / width));
+        this.height = height;
+    }
+
+    public Sprite(Image image, int width) {
+        this(image, width, (int) Math.round(image.getHeight() / (image.getWidth() / width)));
     }
 
     public void setPos(int x, int y) {
@@ -33,10 +35,6 @@ public class Sprite {
         vel.set(x, y);
     }
 
-    public Vector2D getVel() {
-        return vel;
-    }
-
     public void update() {
         pos.add(vel);
     }
@@ -49,16 +47,12 @@ public class Sprite {
         return height;
     }
 
-    public int getWidth() {
-        return width;
-    }
-
     public void render(GraphicsContext gc) {
         gc.drawImage(image, pos.x, pos.y, width, height);
     }
 
     public void erase(GraphicsContext gc) {
-        gc.drawImage(erase, pos.x, pos.y, width, height);
+        gc.clearRect(pos.x,pos.y,width,height);
     }
 
     private Rectangle2D getBoundary() {
